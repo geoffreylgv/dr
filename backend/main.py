@@ -11,16 +11,14 @@ from .ws_manager import WSManager
 from .api import containers, scan, logs
 
 
-docker_client = DockerClient()
-scanner = Scanner(docker_client)
-ws_manager = WSManager(docker_client)
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    asyncio.create_task(scanner.update_trivy_db())
+    app.state.docker = DockerClient()
+    app.state.scanner = Scanner(app.state.docker)
+    app.state.ws_manager = WSManager(app.state.docker)
+    asyncio.create_task(app.state.scanner.update_trivy_db())
     yield
-    docker_client.close()
+    app.state.docker.close()
 
 
 app = FastAPI(title="Docker Doctor", version="1.0.0", lifespan=lifespan)

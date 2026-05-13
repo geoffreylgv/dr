@@ -1,17 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 import docker
 
-from ..scanner import Scanner
-from ..docker_client import DockerClient
-
 router = APIRouter()
-_scanner = Scanner(DockerClient())
 
 
 @router.post("/scan/{container_id}")
-async def scan_container(container_id: str):
+async def scan_container(container_id: str, request: Request):
     try:
-        return await _scanner.scan_container(container_id)
+        return await request.app.state.scanner.scan_container(container_id)
     except docker.errors.NotFound:
         raise HTTPException(status_code=404, detail=f"Container {container_id} not found")
     except docker.errors.DockerException as exc:
