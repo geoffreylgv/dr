@@ -26,6 +26,6 @@ RUN pip install --no-cache-dir -e ./backend
 COPY backend/ ./backend/
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 
-EXPOSE 8080
+EXPOSE 5050
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "5050"]
